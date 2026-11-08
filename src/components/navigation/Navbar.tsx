@@ -9,7 +9,9 @@ import {
   Video as VideoIcon, 
   Layers, 
   PlusCircle, 
-  FolderPlus 
+  FolderPlus,
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 import { ViewFilter, ViewLayout } from '@/types/gallery';
 
@@ -22,6 +24,8 @@ interface NavbarProps {
   onLayoutChange: (layout: ViewLayout) => void;
   onCreateFolderClick?: () => void;
   onUploadClick?: () => void;
+  activeQuality?: 'mobile' | 'hd';
+  onToggleQuality?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -33,6 +37,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLayoutChange,
   onCreateFolderClick,
   onUploadClick,
+  activeQuality,
+  onToggleQuality,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors">
@@ -116,6 +122,35 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Layers className="w-4 h-4" />
             </button>
+
+            {/* Network Resolution Mode Switcher */}
+            {activeQuality && onToggleQuality && (
+              <button
+                onClick={onToggleQuality}
+                title={`Current Mode: ${
+                  activeQuality === 'hd'
+                    ? 'Ultra HD (Wi-Fi Quality). Click to switch to Data Saver'
+                    : 'Data Saver (Mobile Data Mode). Click to switch to Ultra HD'
+                }`}
+                className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                  activeQuality === 'hd'
+                    ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200/70'
+                }`}
+              >
+                {activeQuality === 'hd' ? (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Ultra HD</span>
+                  </>
+                ) : (
+                  <>
+                    <Smartphone className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Data Saver</span>
+                  </>
+                )}
+              </button>
+            )}
 
             {/* Subfolder & Upload Action Buttons */}
             {onCreateFolderClick && (

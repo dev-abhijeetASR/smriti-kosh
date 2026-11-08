@@ -11,10 +11,10 @@ import {
   Maximize, 
   Minimize, 
   Play, 
-  Pause,
   Folder,
   Calendar,
-  HardDrive
+  HardDrive,
+  Sparkles
 } from 'lucide-react';
 import { MediaItem } from '@/types/gallery';
 
@@ -24,6 +24,7 @@ interface LightboxViewerProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (newIndex: number) => void;
+  initialQuality?: 'mobile' | 'hd';
 }
 
 export const LightboxViewer: React.FC<LightboxViewerProps> = ({
@@ -32,12 +33,18 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
   isOpen,
   onClose,
   onNavigate,
+  initialQuality = 'mobile',
 }) => {
   const [showInfo, setShowInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isHdQuality, setIsHdQuality] = useState(initialQuality === 'hd');
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const filmstripRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsHdQuality(initialQuality === 'hd');
+  }, [initialQuality]);
 
   const currentItem = items[currentIndex];
   const isFirst = currentIndex === 0;
@@ -141,6 +148,10 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
   if (!isOpen || !currentItem) return null;
 
   const isVideo = currentItem.type === 'video';
+  const displayImageUrl =
+    isHdQuality && currentItem.hdUrl
+      ? currentItem.hdUrl
+      : currentItem.mobileUrl || currentItem.url;
 
   return (
     <div 
@@ -166,7 +177,27 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Quality Mode Toggle Badge (Data Saver vs Ultra HD) */}
+          {!isVideo && currentItem.hdUrl && (
+            <button
+              onClick={() => setIsHdQuality((prev) => !prev)}
+              title={
+                isHdQuality
+                  ? 'Currently in Ultra HD. Click to switch to Data Saver (Mobile Data)'
+                  : 'Currently in Data Saver. Click to load Ultra HD'
+              }
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                isHdQuality
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-500/20'
+                  : 'bg-white/10 hover:bg-white/20 text-zinc-300 border-white/15'
+              }`}
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${isHdQuality ? 'text-amber-400' : 'text-zinc-400'}`} />
+              <span>{isHdQuality ? 'Ultra HD' : 'Data Saver'}</span>
+            </button>
+          )}
+
           {/* Info Panel Toggle */}
           <button
             onClick={() => setShowInfo((prev) => !prev)}
@@ -189,11 +220,11 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
 
           {/* Download Button */}
           <a
-            href={currentItem.url}
+            href={currentItem.hdUrl || currentItem.url}
             download={currentItem.title}
             target="_blank"
             rel="noopener noreferrer"
-            title="Download Original"
+            title="Download Original High-Res"
             className="p-2 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
           >
             <Download className="w-5 h-5" />
@@ -232,25 +263,36 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
         {/* Center: Image or Video */}
         <div className="relative max-w-full max-h-[75vh] sm:max-h-[80vh] flex items-center justify-center">
           {isVideo ? (
-            <div className="relative rounded-lg overflow-hidden bg-black max-w-4xl max-h-[75vh] flex items-center justify-center shadow-2xl border border-white/10">
-              <video
-                ref={videoRef}
-                src={currentItem.url}
-                controls
-                autoPlay
-                playsInline
-                className="max-h-[72vh] w-auto rounded-lg"
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
+            currentItem.youtubeId ? (
+              <div className="relative w-[90vw] max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-black">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${currentItem.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={currentItem.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                />
+              </div>
+            ) : (
+              <div className="relative rounded-lg overflow-hidden bg-black max-w-4xl max-h-[75vh] flex items-center justify-center shadow-2xl border border-white/10">
+                <video
+                  ref={videoRef}
+                  src={currentItem.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-h-[72vh] w-auto rounded-lg"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )
           ) : (
             <div className="relative flex items-center justify-center">
-              {/* High-res Image */}
               <img
-                src={currentItem.url}
+                src={displayImageUrl}
                 alt={currentItem.title}
-                className="max-h-[75vh] sm:max-h-[80vh] max-w-full w-auto h-auto object-contain rounded-md shadow-2xl pointer-events-auto"
+                className="max-h-[75vh] sm:max-h-[80vh] max-w-full w-auto h-auto object-contain rounded-md shadow-2xl pointer-events-auto transition-all"
                 loading="eager"
               />
             </div>
@@ -309,7 +351,7 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-indigo-400" />
+                <Calendar className="w-4 h-4 text-amber-400" />
                 <div>
                   <p className="text-zinc-400">Date Captured</p>
                   <p className="text-zinc-200 font-medium">{currentItem.date}</p>
@@ -320,17 +362,17 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
                 <div className="flex items-center gap-2">
                   <HardDrive className="w-4 h-4 text-emerald-400" />
                   <div>
-                    <p className="text-zinc-400">File Size</p>
+                    <p className="text-zinc-400">Original Size</p>
                     <p className="text-zinc-200 font-medium">{currentItem.fileSize}</p>
                   </div>
                 </div>
               )}
 
               <div>
-                <p className="text-zinc-400">Type</p>
-                <span className="inline-block mt-1 uppercase font-semibold text-[10px] tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
-                  {currentItem.type}
-                </span>
+                <p className="text-zinc-400">Resolution Mode</p>
+                <p className="text-amber-300 font-semibold mt-0.5">
+                  {isHdQuality ? '🌟 Ultra HD (High Resolution)' : '⚡ Data Saver (Compressed WebP)'}
+                </p>
               </div>
             </div>
           </aside>
@@ -351,7 +393,7 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
                 onClick={() => onNavigate(idx)}
                 className={`relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden transition-all duration-200 border-2 ${
                   isActive
-                    ? 'border-indigo-500 ring-2 ring-indigo-500/40 scale-110 shadow-lg'
+                    ? 'border-amber-500 ring-2 ring-amber-500/40 scale-110 shadow-lg'
                     : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'
                 }`}
               >

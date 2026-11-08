@@ -1,16 +1,20 @@
 export type MediaType = 'image' | 'video';
+export type QualityMode = 'auto' | 'mobile' | 'hd';
 
 export interface MediaItem {
   id: string;
   title: string;
   type: MediaType;
   url: string;
-  thumbnailUrl: string;
+  hdUrl?: string;       // Ultra HD / Original resolution for Wi-Fi & Desktop
+  mobileUrl?: string;   // Data-saver compressed version for cellular networks
+  thumbnailUrl: string; // Lightweight thumbnail for initial grid (6+ on screen)
+  youtubeId?: string;   // For YouTube unlisted video stream
   occasionId: string;
   subfolderId: string;
   subfolderName: string;
   date: string;
-  duration?: string; // For videos (e.g., '1:24')
+  duration?: string;    // For videos (e.g., '1:24')
   width?: number;
   height?: number;
   description?: string;

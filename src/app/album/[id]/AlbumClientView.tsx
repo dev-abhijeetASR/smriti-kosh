@@ -9,6 +9,8 @@ import { PhotosGrid } from '@/components/gallery/PhotosGrid';
 import { LightboxViewer } from '@/components/gallery/LightboxViewer';
 import { CreateFolderModal } from '@/components/modals/CreateFolderModal';
 import { UploadMediaModal } from '@/components/modals/UploadMediaModal';
+import { NetworkBanner } from '@/components/navigation/NetworkBanner';
+import { useNetworkQuality } from '@/lib/useNetworkQuality';
 import { getAlbumById } from '@/lib/albums-data';
 import { MediaItem, SubFolder, ViewFilter, ViewLayout } from '@/types/gallery';
 import { Share2, Calendar, Folder, Check } from 'lucide-react';
@@ -40,6 +42,20 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
 
   // Lightbox state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // Network quality & Data Saver state
+  const {
+    isMobileData,
+    activeQuality,
+    qualityMode,
+    setQualityMode,
+    bannerDismissed,
+    dismissBanner,
+  } = useNetworkQuality();
+
+  const toggleQuality = () => {
+    setQualityMode(activeQuality === 'hd' ? 'mobile' : 'hd');
+  };
 
   // Sync subfolder counts whenever items change
   const currentSubfolders = useMemo(() => {
@@ -115,6 +131,18 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
         onLayoutChange={setActiveLayout}
         onCreateFolderClick={() => setIsFolderModalOpen(true)}
         onUploadClick={() => setIsUploadModalOpen(true)}
+        activeQuality={activeQuality}
+        onToggleQuality={toggleQuality}
+      />
+
+      {/* Network Resolution Mode Banner */}
+      <NetworkBanner
+        isMobileData={isMobileData}
+        activeQuality={activeQuality}
+        qualityMode={qualityMode}
+        onSetQuality={setQualityMode}
+        isDismissed={bannerDismissed}
+        onDismiss={dismissBanner}
       />
 
       {/* 2. Main Container */}
@@ -228,6 +256,7 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
           isOpen={lightboxIndex !== null}
           onClose={() => setLightboxIndex(null)}
           onNavigate={(newIdx) => setLightboxIndex(newIdx)}
+          initialQuality={activeQuality}
         />
       )}
 
