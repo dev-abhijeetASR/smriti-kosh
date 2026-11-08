@@ -13,7 +13,7 @@ import { NetworkBanner } from '@/components/navigation/NetworkBanner';
 import { useNetworkQuality } from '@/lib/useNetworkQuality';
 import { getAlbumById } from '@/lib/albums-data';
 import { MediaItem, SubFolder, ViewFilter, ViewLayout } from '@/types/gallery';
-import { Share2, Calendar, Folder, Check } from 'lucide-react';
+import { Share2, Calendar, Folder, Check, HardDrive, ExternalLink } from 'lucide-react';
 
 interface AlbumClientViewProps {
   albumId: string;
@@ -193,6 +193,18 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
                   </>
                 )}
               </button>
+
+              <a
+                href="https://drive.google.com/drive/folders/1t3wSdKDUo7eSVLNxofylMkVO0zU7ChgY"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open and download uncompressed 14MB camera RAW originals from Google Drive"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 active:scale-95 text-amber-200 text-xs sm:text-sm font-semibold backdrop-blur-md border border-amber-500/40 transition-all shadow-sm"
+              >
+                <HardDrive className="w-4 h-4 text-amber-400" />
+                <span>Original Raw Photos (Google Drive)</span>
+                <ExternalLink className="w-3.5 h-3.5 text-amber-300 ml-0.5" />
+              </a>
 
               <button
                 onClick={() => setIsUploadModalOpen(true)}

@@ -14,7 +14,8 @@ import {
   Folder,
   Calendar,
   HardDrive,
-  Sparkles
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import { MediaItem } from '@/types/gallery';
 
@@ -373,6 +374,21 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
                 <p className="text-amber-300 font-semibold mt-0.5">
                   {isHdQuality ? '🌟 Ultra HD (High Resolution)' : '⚡ Data Saver (Compressed WebP)'}
                 </p>
+              </div>
+
+              <div className="pt-3 border-t border-zinc-800">
+                <a
+                  href="https://drive.google.com/drive/folders/1t3wSdKDUo7eSVLNxofylMkVO0zU7ChgY"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-200 text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <HardDrive className="w-4 h-4 text-amber-400" />
+                    <span className="font-medium">Raw 14MB File (Drive)</span>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
+                </a>
               </div>
             </div>
           </aside>

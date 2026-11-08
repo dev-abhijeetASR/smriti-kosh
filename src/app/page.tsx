@@ -10,7 +10,9 @@ import {
   Sparkles, 
   Video, 
   Images,
-  FolderOpen
+  FolderOpen,
+  HardDrive,
+  ExternalLink
 } from 'lucide-react';
 import { getAllAlbums } from '@/lib/albums-data';
 import { Navbar } from '@/components/navigation/Navbar';
@@ -61,6 +63,18 @@ export default function HomePage() {
               The Sacred Treasury of Family Milestones, Ceremonies & Cherished Memories. 
               Organized with Google Drive-style folders and an immersive Google Photos viewer.
             </p>
+            <div className="mt-4 flex items-center gap-3 flex-wrap">
+              <a
+                href="https://drive.google.com/drive/folders/1t3wSdKDUo7eSVLNxofylMkVO0zU7ChgY"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-semibold transition-all shadow-sm"
+              >
+                <HardDrive className="w-3.5 h-3.5 text-amber-400" />
+                <span>Original 14MB Raw Photos Vault (Google Drive)</span>
+                <ExternalLink className="w-3 h-3 text-amber-300 ml-0.5" />
+              </a>
+            </div>
           </div>
         </div>
 
