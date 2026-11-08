@@ -180,7 +180,7 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
         <div className="mb-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              Occasion Subfolders
+              स्मृति उप-फ़ोल्डर • Subfolders
             </h3>
             <span className="text-xs text-zinc-400">
               Select a folder to filter or view all

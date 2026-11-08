@@ -1,6 +1,12 @@
-# 📸 Moments Gallery — Google Photos & Drive Inspired Viewer
+# 🕉️ स्मृति कोष (Smriti Kosh) — The Sacred Treasury of Family Moments
 
-A fast, responsive photo and video gallery web app designed for family occasions, ceremonies, and cherished gatherings.
+> **जीवन के पावन उत्सव और अमूल्य क्षणों का संचय**  
+> *The Sacred Treasury of Family Milestones, Ceremonies & Cherished Memories.*
+
+A fast, responsive photo and video gallery web app inspired by **Google Photos** and **Google Drive**, crafted for family milestones and celebrations.
+
+**GitHub Repository**: [https://github.com/dev-abhijeetASR/smriti-kosh](https://github.com/dev-abhijeetASR/smriti-kosh)  
+**Suggested Vercel URL**: `https://smriti-kosh.vercel.app`
 
 Built with **Next.js 15 (React 19)**, **Tailwind CSS**, **Lucide Icons**, and **Framer Motion**.
 

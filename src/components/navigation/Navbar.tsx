@@ -38,17 +38,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3 sm:gap-6">
-          {/* Logo & Brand */}
+          {/* Logo & Brand: Devanagari Hero + Graceful English Accent */}
           <Link 
             href="/" 
-            className="flex items-center gap-2.5 text-zinc-900 dark:text-zinc-100 font-semibold text-lg tracking-tight hover:opacity-90 transition-opacity flex-shrink-0"
+            className="flex items-center gap-2.5 text-zinc-900 dark:text-zinc-100 group flex-shrink-0"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-sm shadow-rose-500/20">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-amber-600 flex items-center justify-center text-white shadow-sm shadow-amber-500/25 group-hover:scale-105 transition-transform">
               <Images className="w-5 h-5" />
             </div>
-            <span className="hidden sm:inline bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent font-bold">
-              Moments
-            </span>
+            <div className="flex flex-col">
+              <span className="text-base sm:text-lg font-bold tracking-tight bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 dark:from-amber-400 dark:via-rose-300 dark:to-indigo-300 bg-clip-text text-transparent leading-none">
+                स्मृति कोष
+              </span>
+              <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 leading-tight">
+                Smriti Kosh
+              </span>
+            </div>
           </Link>
 
           {/* Search Bar - Google Drive / Photos style */}
@@ -57,10 +62,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search photos, videos, relatives, occasions..."
+                placeholder="Search memories, relatives, occasions • खोजें..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 rounded-full border border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 rounded-full border border-transparent focus:border-amber-500 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
               />
             </div>
           </div>
@@ -135,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* GitHub Repo Link */}
             <a
-              href="https://github.com/dev-abhijeetASR/moments-gallery"
+              href="https://github.com/dev-abhijeetASR/smriti-kosh"
               target="_blank"
               rel="noopener noreferrer"
               title="View on GitHub"

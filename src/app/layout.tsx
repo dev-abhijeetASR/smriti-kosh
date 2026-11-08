@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Moments Gallery — Occasion Photo & Video Viewer",
-  description: "An intuitive Google Photos & Google Drive inspired photo and video viewer for family occasions and celebrations.",
+  title: "स्मृति कोष • Smriti Kosh — The Sacred Treasury of Family Moments",
+  description: "जीवन के पावन उत्सव और अमूल्य क्षणों का संचय | A sacred, high-performance photo & video gallery for family occasions and milestones.",
 };
 
 export default function RootLayout({
