@@ -34,10 +34,14 @@ yarn-error.log*
 .env*
 
 # vercel
-.vercel
+# local large video files (served locally, excluded from git size limits)
+public/albums/**/*.mp4
+public/albums/**/*.MP4
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# local large video files (served locally, excluded from git size limits)
+public/albums/**/*.mp4
+public/albums/**/*.MP4
