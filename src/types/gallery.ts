@@ -11,6 +11,8 @@ export interface MediaItem {
   thumbnailUrl: string; // Lightweight thumbnail for initial grid (6+ on screen)
   youtubeId?: string;   // For YouTube unlisted video stream
   occasionId: string;
+  parentFolderId?: string;
+  parentFolderName?: string;
   subfolderId: string;
   subfolderName: string;
   date: string;
@@ -21,9 +23,22 @@ export interface MediaItem {
   fileSize?: string;
 }
 
+export interface ParentFolder {
+  id: string;
+  name: string;
+  localPath?: string;
+  description?: string;
+  coverImage?: string;
+  itemCount: number;
+  subfolderIds: string[];
+}
+
 export interface SubFolder {
   id: string;
   name: string;
+  parentId?: string | null;
+  parentName?: string | null;
+  localPath?: string;
   description?: string;
   coverImage?: string;
   itemCount: number;
@@ -35,6 +50,7 @@ export interface OccasionAlbum {
   subtitle: string;
   date: string;
   coverImage: string;
+  parentFolders?: ParentFolder[];
   subfolders: SubFolder[];
   items: MediaItem[];
 }

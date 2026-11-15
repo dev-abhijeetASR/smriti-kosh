@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import { Navbar } from '@/components/navigation/Navbar';
 import { DriveBreadcrumbs } from '@/components/navigation/DriveBreadcrumbs';
+import { DriveFolderGrid } from '@/components/navigation/DriveFolderGrid';
 import { SubfolderChips } from '@/components/navigation/SubfolderChips';
 import { PhotosGrid } from '@/components/gallery/PhotosGrid';
 import { LightboxViewer } from '@/components/gallery/LightboxViewer';
@@ -12,7 +13,7 @@ import { UploadMediaModal } from '@/components/modals/UploadMediaModal';
 import { NetworkBanner } from '@/components/navigation/NetworkBanner';
 import { useNetworkQuality } from '@/lib/useNetworkQuality';
 import { getAlbumById } from '@/lib/albums-data';
-import { MediaItem, SubFolder, ViewFilter, ViewLayout } from '@/types/gallery';
+import { MediaItem, SubFolder, ParentFolder, ViewFilter, ViewLayout } from '@/types/gallery';
 import { Share2, Calendar, Folder, Check, HardDrive, ExternalLink } from 'lucide-react';
 
 interface AlbumClientViewProps {
@@ -28,9 +29,14 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
   }
 
   // Active state
+  const [parentFolders, setParentFolders] = useState<ParentFolder[]>(initialAlbum.parentFolders || []);
   const [subfolders, setSubfolders] = useState<SubFolder[]>(initialAlbum.subfolders);
   const [items, setItems] = useState<MediaItem[]>(initialAlbum.items);
+  
+  // Two-tier folder hierarchy state
+  const [activeParentFolderId, setActiveParentFolderId] = useState<string | null>(null);
   const [activeSubfolderId, setActiveSubfolderId] = useState<string | null>(null);
+
   const [activeFilter, setActiveFilter] = useState<ViewFilter>('all');
   const [activeLayout, setActiveLayout] = useState<ViewLayout>('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +63,7 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
     setQualityMode(activeQuality === 'hd' ? 'mobile' : 'hd');
   };
 
-  // Sync subfolder counts whenever items change
+  // Sync parent folder and subfolder item counts
   const currentSubfolders = useMemo(() => {
     return subfolders.map((f) => ({
       ...f,
@@ -65,31 +71,47 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
     }));
   }, [subfolders, items]);
 
-  // Filter items by subfolder, type (all/image/video), and search query
+  const currentParentFolders = useMemo(() => {
+    return parentFolders.map((p) => ({
+      ...p,
+      itemCount: items.filter((item) => item.parentFolderId === p.id).length,
+    }));
+  }, [parentFolders, items]);
+
+  // Filter items by subfolder, parent folder, media type, and search query
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      // 1. Subfolder filter
-      if (activeSubfolderId && item.subfolderId !== activeSubfolderId) {
-        return false;
+      // 1. Specific subfolder filter (e.g. CD1, CD2, HALDI, Ceremony)
+      if (activeSubfolderId) {
+        if (item.subfolderId !== activeSubfolderId) return false;
       }
-      // 2. Media Type filter
+      // 2. Parent folder filter (e.g. MOM-DAD, ShaadiShekhar, ShaadiMonu)
+      else if (activeParentFolderId) {
+        if (item.parentFolderId !== activeParentFolderId) return false;
+      }
+
+      // 3. Media Type filter (all / image / video)
       if (activeFilter !== 'all' && item.type !== activeFilter) {
         return false;
       }
-      // 3. Search query filter
+
+      // 4. Search query filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesTitle = item.title.toLowerCase().includes(query);
         const matchesSubfolder = item.subfolderName.toLowerCase().includes(query);
+        const matchesParent = item.parentFolderName?.toLowerCase().includes(query);
         const matchesDesc = item.description?.toLowerCase().includes(query);
-        return matchesTitle || matchesSubfolder || matchesDesc;
+        return matchesTitle || matchesSubfolder || matchesParent || matchesDesc;
       }
       return true;
     });
-  }, [items, activeSubfolderId, activeFilter, searchQuery]);
+  }, [items, activeParentFolderId, activeSubfolderId, activeFilter, searchQuery]);
 
-  // Active subfolder object
+  // Active folder objects
+  const activeParent = currentParentFolders.find((p) => p.id === activeParentFolderId);
   const activeSubfolder = currentSubfolders.find((f) => f.id === activeSubfolderId);
+  const activeLocalPath = activeSubfolder?.localPath || activeParent?.localPath;
 
   // Handle creating a new subfolder
   const handleCreateFolder = (name: string, description: string) => {
@@ -97,6 +119,8 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
     const newFolder: SubFolder = {
       id: newId,
       name,
+      parentId: activeParentFolderId || null,
+      parentName: activeParent?.name || null,
       description,
       itemCount: 0,
       coverImage: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80',
@@ -107,7 +131,12 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
 
   // Handle uploading/adding new media
   const handleAddMedia = (newItem: MediaItem) => {
-    setItems((prev) => [newItem, ...prev]);
+    const enrichedItem: MediaItem = {
+      ...newItem,
+      parentFolderId: activeParentFolderId || undefined,
+      parentFolderName: activeParent?.name || undefined,
+    };
+    setItems((prev) => [enrichedItem, ...prev]);
   };
 
   // Copy shareable link
@@ -147,11 +176,20 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
 
       {/* 2. Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        {/* Breadcrumb Navigation - Google Drive style */}
+        {/* Breadcrumb Navigation - Google Drive style with parent and child support */}
         <DriveBreadcrumbs
           occasionTitle={initialAlbum.title}
           occasionId={initialAlbum.id}
+          parentFolderName={activeParent?.name}
           activeSubfolderName={activeSubfolder?.name}
+          localPath={activeLocalPath}
+          onSelectOccasionRoot={() => {
+            setActiveParentFolderId(null);
+            setActiveSubfolderId(null);
+          }}
+          onSelectParentFolder={() => {
+            setActiveSubfolderId(null);
+          }}
           totalItems={filteredItems.length}
         />
 
@@ -164,7 +202,7 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Folder className="w-3.5 h-3.5" />
-                {currentSubfolders.length} Subfolders
+                {currentParentFolders.length > 0 ? `${currentParentFolders.length} Folders` : `${currentSubfolders.length} Subfolders`}
               </span>
             </div>
 
@@ -216,21 +254,31 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
           </div>
         </div>
 
-        {/* Subfolder Chips Navigation (Google Drive / Photos style) */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              स्मृति उप-फ़ोल्डर • Subfolders
-            </h3>
-            <span className="text-xs text-zinc-400">
-              Select a folder to filter or view all
-            </span>
-          </div>
+        {/* Google Drive Style Folder Cards Grid (Main Folders & Subfolders) */}
+        <DriveFolderGrid
+          parentFolders={currentParentFolders}
+          subfolders={currentSubfolders}
+          activeParentFolderId={activeParentFolderId}
+          activeSubfolderId={activeSubfolderId}
+          onSelectParentFolder={(pid) => {
+            setActiveParentFolderId(pid);
+            setActiveSubfolderId(null);
+          }}
+          onSelectSubfolder={(sid) => setActiveSubfolderId(sid)}
+        />
 
+        {/* Subfolder Chips Navigation Bar */}
+        <div className="mb-5">
           <SubfolderChips
+            parentFolders={currentParentFolders}
             subfolders={currentSubfolders}
+            activeParentFolderId={activeParentFolderId}
             activeSubfolderId={activeSubfolderId}
-            onSelectSubfolder={setActiveSubfolderId}
+            onSelectParentFolder={(pid) => {
+              setActiveParentFolderId(pid);
+              setActiveSubfolderId(null);
+            }}
+            onSelectSubfolder={(sid) => setActiveSubfolderId(sid)}
             totalOccasionItems={items.length}
             onCreateFolderClick={() => setIsFolderModalOpen(true)}
           />
@@ -240,7 +288,11 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
         <div className="flex items-center justify-between py-2 mb-3 border-b border-zinc-200/80 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-              {activeSubfolder ? activeSubfolder.name : 'All Photos & Videos'}
+              {activeSubfolder
+                ? activeSubfolder.name
+                : activeParent
+                ? `${activeParent.name} (All Subfolders)`
+                : 'All Photos & Videos'}
             </h2>
             <span className="text-xs text-zinc-500 bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded-full font-medium">
               {filteredItems.length}
@@ -248,11 +300,11 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
           </div>
 
           <p className="text-xs text-zinc-500 hidden sm:block">
-            Click any photo to open full-screen gallery with navigation arrows
+            Click any photo or video to open full-screen gallery with navigation arrows
           </p>
         </div>
 
-        {/* 3. Responsive Photos & Videos Grid (Guaranteed 6+ photos on screen) */}
+        {/* 3. Responsive Photos & Videos Grid (Guaranteed 6+ items on screen) */}
         <PhotosGrid
           items={filteredItems}
           onItemClick={(idx) => setLightboxIndex(idx)}
@@ -260,7 +312,7 @@ export const AlbumClientView: React.FC<AlbumClientViewProps> = ({ albumId }) => 
         />
       </main>
 
-      {/* 4. Fullscreen Interactive Lightbox Modal */}
+      {/* 4. Fullscreen Interactive Lightbox Modal (Bounded strictly to currently viewed folder) */}
       {lightboxIndex !== null && (
         <LightboxViewer
           items={filteredItems}
