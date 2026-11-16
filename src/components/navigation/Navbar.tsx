@@ -11,7 +11,8 @@ import {
   PlusCircle, 
   FolderPlus,
   Sparkles,
-  Smartphone
+  Smartphone,
+  FileText
 } from 'lucide-react';
 import { ViewFilter, ViewLayout } from '@/types/gallery';
 
@@ -111,6 +112,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <VideoIcon className="w-3.5 h-3.5" />
                 Videos
+              </button>
+              <button
+                onClick={() => onFilterChange('document')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                  activeFilter === 'document'
+                    ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm font-semibold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                Docs
               </button>
             </div>
 

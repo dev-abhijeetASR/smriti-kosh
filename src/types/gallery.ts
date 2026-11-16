@@ -1,4 +1,4 @@
-export type MediaType = 'image' | 'video';
+export type MediaType = 'image' | 'video' | 'document';
 export type QualityMode = 'auto' | 'mobile' | 'hd';
 
 export interface MediaItem {
@@ -21,6 +21,7 @@ export interface MediaItem {
   height?: number;
   description?: string;
   fileSize?: string;
+  fileExtension?: string;
 }
 
 export interface ParentFolder {
@@ -55,5 +56,5 @@ export interface OccasionAlbum {
   items: MediaItem[];
 }
 
-export type ViewFilter = 'all' | 'image' | 'video';
+export type ViewFilter = 'all' | 'image' | 'video' | 'document';
 export type ViewLayout = 'grid' | 'masonry' | 'compact';

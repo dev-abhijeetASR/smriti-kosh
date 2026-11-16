@@ -20,7 +20,8 @@ import {
   ZoomOut,
   RotateCw,
   RotateCcw,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from 'lucide-react';
 import { MediaItem } from '@/types/gallery';
 
@@ -302,6 +303,7 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
   if (!isOpen || !currentItem) return null;
 
   const isVideo = currentItem.type === 'video';
+  const isDoc = currentItem.type === 'document';
   const displayImageUrl =
     isHdQuality && currentItem.hdUrl
       ? currentItem.hdUrl
@@ -332,7 +334,7 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
         {/* Right: Actions */}
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Quality Mode Toggle Badge (Data Saver vs Ultra HD) */}
-          {!isVideo && currentItem.hdUrl && (
+          {!isVideo && !isDoc && currentItem.hdUrl && (
             <button
               onClick={() => setIsHdQuality((prev) => !prev)}
               title={
@@ -430,7 +432,43 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
 
         {/* Center Media: Image or Video */}
         <div className="relative max-w-full max-h-[75vh] sm:max-h-[80vh] flex items-center justify-center pointer-events-none">
-          {isVideo ? (
+          {isDoc ? (
+            <div className="relative z-20 flex flex-col items-center justify-center p-6 sm:p-8 rounded-2xl bg-zinc-900/90 border border-zinc-700/80 shadow-2xl max-w-lg w-[90vw] text-center text-white backdrop-blur-xl pointer-events-auto">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4 shadow-inner">
+                <FileText className="w-8 h-8" />
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-zinc-100 max-w-full truncate">
+                {currentItem.title}
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1">
+                {currentItem.subfolderName} • {currentItem.date}
+              </p>
+              {currentItem.fileSize && (
+                <div className="mt-2 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-zinc-300 font-mono text-[11px]">
+                  File Size: {currentItem.fileSize}
+                </div>
+              )}
+              <div className="flex items-center gap-3 mt-6 flex-wrap justify-center">
+                <a
+                  href={currentItem.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open in Browser</span>
+                </a>
+                <a
+                  href={currentItem.url}
+                  download
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center gap-1.5 transition-all border border-white/20 active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Document</span>
+                </a>
+              </div>
+            </div>
+          ) : isVideo ? (
             currentItem.youtubeId ? (
               <div className="relative w-[92vw] max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-black pointer-events-auto">
                 <iframe
@@ -572,7 +610,7 @@ export const LightboxViewer: React.FC<LightboxViewerProps> = ({
       </div>
 
       {/* FLOATING ZOOM & ROTATION TOOLBAR (FOR ALL DEVICES: ANDROID, IPHONE, WINDOWS, MAC) */}
-      {!isVideo && (
+      {!isVideo && !isDoc && (
         <div className="relative z-30 flex items-center justify-center py-1">
           <div className="flex items-center gap-1 sm:gap-2 px-3 py-1.5 rounded-full bg-zinc-900/90 backdrop-blur-xl border border-white/15 shadow-2xl text-white">
             {/* Rotate Left 90° */}

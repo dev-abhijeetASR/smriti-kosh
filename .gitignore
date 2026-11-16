@@ -37,11 +37,23 @@ yarn-error.log*
 # local video and audio media (served locally, excluded from git/Vercel size limit)
 public/albums/**/*.mp4
 public/albums/**/*.MP4
+public/albums/**/*.mov
+public/albums/**/*.MOV
+public/albums/**/*.mkv
+public/albums/**/*.MKV
 public/albums/**/*.mp3
 public/albums/**/*.m4a
 public/albums/**/*.aac
 public/albums/**/*.opus
 public/albums/**/*.amr
+public/albums/**/*.ogg
+public/albums/**/*.pdf
+public/albums/**/*.docx
+public/albums/**/*.xlsx
+public/albums/**/*.xlsb
+public/albums/**/*.csv
+public/albums/**/*.pptx
+
 
 # typescript
 *.tsbuildinfo
