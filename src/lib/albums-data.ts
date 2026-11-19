@@ -4,12 +4,14 @@ import weddingData from './wedding-album.json';
 import zukData from './zuk-album.json';
 import sonyData from './sony-album.json';
 import onedriveData from './onedrive-album.json';
+import picturesData from './pictures-album.json';
 
 const retirementOccasion = processedData.occasion as unknown as OccasionAlbum;
 const weddingOccasion = weddingData.occasion as unknown as OccasionAlbum;
 const zukOccasion = zukData.occasion as unknown as OccasionAlbum;
 const sonyOccasion = sonyData.occasion as unknown as OccasionAlbum;
 const onedriveOccasion = onedriveData.occasion as unknown as OccasionAlbum;
+const picturesOccasion = picturesData.occasion as unknown as OccasionAlbum;
 
 export const INITIAL_ALBUMS: OccasionAlbum[] = [
   retirementOccasion,
@@ -17,6 +19,7 @@ export const INITIAL_ALBUMS: OccasionAlbum[] = [
   zukOccasion,
   sonyOccasion,
   onedriveOccasion,
+  picturesOccasion,
 ];
 
 export function getAlbumById(id: string): OccasionAlbum | undefined {

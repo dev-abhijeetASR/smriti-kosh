@@ -53,6 +53,9 @@ public/albums/**/*.xlsx
 public/albums/**/*.xlsb
 public/albums/**/*.csv
 public/albums/**/*.pptx
+public/albums/**/raw-*.*
+public/albums/**/*.zip
+public/albums/**/*.ZIP
 
 
 # typescript
